@@ -130,12 +130,34 @@ describe("probeProvider", () => {
     expect(Object.keys(results)).toHaveLength(STATUS_PROVIDERS.length);
   });
 
-  it("marks every provider unreachable on unexpected payloads", async () => {
+  it("marks every status-feed provider unreachable on unexpected payloads", async () => {
     stubHost(() => json({ totally: "unexpected" }));
     const results = await probeAll();
     for (const provider of STATUS_PROVIDERS) {
+      if (provider.kind === "http") continue; // 连通性探测不解析载荷，见下方 http kind 测试
       expect(results[provider.id].indicator).toBe("unknown");
     }
+  });
+});
+
+describe("probeProvider http kind", () => {
+  const minimax = () => STATUS_PROVIDERS.find((p) => p.id === "minimax")!;
+
+  it("treats any HTTP response as reachable, including redirects and 404s", async () => {
+    stubHost(() => ({ status: 302, body: "" }));
+    await expect(probeProvider(minimax())).resolves.toEqual({ indicator: "none", description: "", updatedAt: null });
+    stubHost(() => ({ status: 404, body: "" }));
+    await expect(probeProvider(minimax())).resolves.toEqual({ indicator: "none", description: "", updatedAt: null });
+  });
+
+  it("maps 5xx to minor instead of faking an outage", async () => {
+    stubHost(() => ({ status: 503, body: "" }));
+    await expect(probeProvider(minimax())).resolves.toEqual({ indicator: "minor", description: "HTTP 503", updatedAt: null });
+  });
+
+  it("treats a bridge rejection as unreachable", async () => {
+    stubHost(() => Promise.reject(new Error("network down")) as never);
+    await expect(probeProvider(minimax())).resolves.toEqual({ indicator: "unknown", description: "", updatedAt: null });
   });
 });
 
