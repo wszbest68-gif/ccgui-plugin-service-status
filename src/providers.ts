@@ -1,5 +1,6 @@
 /**
- * 状态探针：三源适配（Statuspage.io / Instatus / Google incidents）。
+ * 状态探针：Statuspage.io / Instatus / Google incidents 三源适配，另加无公开
+ * 状态页厂商的 HTTP 连通性探测（kind "http"）。
  *
  * 移植自 TokenTracker `dashboard/src/pages/ServiceStatusPage.jsx`（MIT，见仓库
  * 根 THIRD_PARTY_NOTICES.md），差异只在传输层：上游用浏览器 `fetch`，本插件
@@ -16,8 +17,8 @@ export interface Provider {
   /** 状态页地址；也是「在浏览器中打开」的目标。 */
   pageUrl: string;
   apiUrl: string;
-  /** 探针类型；缺省 = Statuspage.io `/api/v2/status.json`。 */
-  kind?: "statuspage" | "instatus" | "google";
+  /** 探针类型；缺省 = Statuspage.io `/api/v2/status.json`；"http" = 无状态页厂商的连通性探测。 */
+  kind?: "statuspage" | "instatus" | "google" | "http";
   /** Google 共享一份 incidents feed，按服务名过滤。 */
   serviceName?: string;
 }
@@ -74,8 +75,11 @@ export const STATUS_PROVIDERS: Provider[] = [
   {
     id: "minimax",
     name: "MiniMax",
-    apiUrl: "https://status.minimaxi.com/api/v2/status.json",
-    pageUrl: "https://status.minimaxi.com",
+    // MiniMax 无公开状态页（status.minimaxi.com 域名未注册，公网 NXDOMAIN），
+    // 退化为对官方平台域名的 HTTP 连通性探测：拿到任意响应即「运行正常」。
+    kind: "http",
+    apiUrl: "https://platform.minimaxi.com/",
+    pageUrl: "https://platform.minimaxi.com",
   },
   {
     id: "zed",
@@ -179,6 +183,12 @@ export async function probeProvider(provider: Provider): Promise<ProbeResult> {
       PROBE_TIMEOUT_MS + 2_000,
       `status probe ${provider.id}`,
     );
+    if (provider.kind === "http") {
+      // 无状态页厂商：任意 HTTP 响应（含 3xx/4xx）都证明服务可达；5xx 记降级。
+      if (res.status >= 500) return { indicator: "minor", description: `HTTP ${res.status}`, updatedAt: null };
+      if (res.status > 0) return { indicator: "none", description: "", updatedAt: null };
+      throw new Error(`HTTP ${res.status}`);
+    }
     if (res.status !== 200) throw new Error(`HTTP ${res.status}`);
     const body: unknown = JSON.parse(res.body);
     if (provider.kind === "google") return parseGoogleIncidents(body, provider.serviceName ?? "");

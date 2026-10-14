@@ -145,8 +145,10 @@ describe("StatusPage", () => {
     render(<StatusPage />);
 
     await waitFor(() => {
-      expect(screen.getAllByText("无法访问")).toHaveLength(STATUS_PROVIDERS.length);
+      // http 连通性探测（MiniMax）不解析载荷：拿到 200 即运行正常，不参与兜底
+      expect(screen.getAllByText("无法访问")).toHaveLength(STATUS_PROVIDERS.length - 1);
     });
+    expect(screen.getAllByText("运行正常")).toHaveLength(1);
   });
 
   it("opens the provider status page through the platform opener", async () => {

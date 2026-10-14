@@ -26,6 +26,9 @@ proxy against pre-declared hosts):
   `cmd`) instead of an `<a target="_blank">`, since plugin UIs cannot open the
   system browser by themselves.
 - Vendor logo SVGs are not copied; each card shows a neutral monogram tile.
+- MiniMax has no public status page (`status.minimaxi.com` is not a registered
+  domain), so its card uses a plain HTTP connectivity probe against the
+  official platform host (`kind: "http"`) instead of a Statuspage.io feed.
 
 ```
 MIT License
