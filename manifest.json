@@ -19,10 +19,12 @@
     "network:status.claude.com",
     "network:status.openai.com",
     "network:status.cursor.com",
+    "network:status.x.ai",
     "network:www.githubstatus.com",
     "network:www.google.com",
     "network:status.moonshot.cn",
     "network:platform.minimaxi.com",
+    "network:platform.minimax.cn",
     "network:status.zed.dev"
   ],
   "keywords": ["status", "服务状态", "incident", "claude", "openai", "cursor"],

@@ -49,8 +49,10 @@ export const STATUS_PROVIDERS: Provider[] = [
   {
     id: "cursor",
     name: "Cursor",
-    apiUrl: "https://status.cursor.com/api/v2/status.json",
-    pageUrl: "https://status.cursor.com",
+    // status.cursor.com 301 到 status.x.ai（Cursor 状态页已并入 xAI 状态基建），
+    // 直接打规范主机：宿主按「每一跳」校验 network 授权，跟着 301 走会越权失败。
+    apiUrl: "https://status.x.ai/api/compat/status.json",
+    pageUrl: "https://status.x.ai",
   },
   {
     id: "github",
@@ -77,9 +79,10 @@ export const STATUS_PROVIDERS: Provider[] = [
     name: "MiniMax",
     // MiniMax 无公开状态页（status.minimaxi.com 域名未注册，公网 NXDOMAIN），
     // 退化为对官方平台域名的 HTTP 连通性探测：拿到任意响应即「运行正常」。
+    // platform.minimaxi.com 302 到 platform.minimax.cn，直接探落地域名，少一跳也少一次跨域授权。
     kind: "http",
-    apiUrl: "https://platform.minimaxi.com/",
-    pageUrl: "https://platform.minimaxi.com",
+    apiUrl: "https://platform.minimax.cn/",
+    pageUrl: "https://platform.minimax.cn",
   },
   {
     id: "zed",

@@ -4,7 +4,7 @@
 
 在 CC GUI 中心页签里聚合 8 家 AI 提供商**官方状态页**的实时事故状态：
 Claude、OpenAI / Codex、Cursor、GitHub / Copilot、Gemini、Kimi / Moonshot、MiniMax、Zed。
-（MiniMax 无公开状态页，退化为对其官方平台域名 platform.minimaxi.com 的连通性探测。）
+（Cursor 状态页已并入 status.x.ai；MiniMax 无公开状态页，退化为对其官方平台域名 platform.minimax.cn 的连通性探测。）
 每分钟自动刷新，也可以手动刷新；点卡片用系统浏览器打开该家的官方状态页。
 
 ![服务状态界面](docs/screenshot-1.png)
@@ -59,7 +59,7 @@ TokenTracker 作者无隶属关系。
 | `ui:sidebar-entry` | 首页侧栏入口 |
 | `ui:command` | 命令面板「打开服务状态」 |
 | `exec:open` / `exec:xdg-open` / `exec:cmd` | 点击卡片时调用系统打开器（macOS / Linux / Windows） |
-| `network:status.claude.com`、`network:status.openai.com`、`network:status.cursor.com`、`network:www.githubstatus.com`、`network:www.google.com`、`network:status.moonshot.cn`、`network:platform.minimaxi.com`、`network:status.zed.dev` | 只读拉取各厂商公开状态页 JSON；MiniMax 无状态页，仅探测官方平台连通性 |
+| `network:status.claude.com`、`network:status.openai.com`、`network:status.cursor.com`、`network:status.x.ai`、`network:www.githubstatus.com`、`network:www.google.com`、`network:status.moonshot.cn`、`network:platform.minimaxi.com`、`network:platform.minimax.cn`、`network:status.zed.dev` | 只读拉取各厂商公开状态页 JSON；MiniMax 无状态页，仅探测官方平台连通性 |
 
 关于 `exec:` 的三条授权：插件拿不到宿主的「打开外链」能力，只能用系统打开器
 （`open` / `xdg-open` / `cmd /c start`）。代码里 URL 只来自 `src/providers.ts` 的常量表
